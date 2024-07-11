@@ -1,15 +1,17 @@
+<!-- Svelte demo code for the "Avatar information" section of the Circles SDK documentation -->
 <script lang="ts">
     import {Sdk, type ChainConfig, type SdkContractRunner, Avatar} from "@circles-sdk/sdk";
+    import {CirclesQuery, type TransactionHistoryRow} from "@circles-sdk/data";
     import {BrowserProvider} from "ethers";
     import {onMount} from "svelte";
 
     let avatar: Avatar | undefined;
     let sdk: Sdk | undefined;
     let error: Error | undefined;
-    let totalBalance: string | undefined;
-    let mintableAmount: string | undefined;
+    let totalBalance: number | undefined;
+    let mintableAmount: number | undefined;
     let trustRelations: any;
-    let transactionHistory: any;
+    let transactionHistory: CirclesQuery<TransactionHistoryRow> | undefined;
 
     const chainConfig: ChainConfig = {
         pathfinderUrl: 'https://pathfinder.aboutcircles.com',
@@ -36,18 +38,15 @@
 
     onMount(async () => {
         sdk = await getSdk();
-    });
 
-    async function loadAvatar() {
-        error = undefined;
         try {
             const loadedAvatar = await sdk?.getAvatar(sdk?.contractRunner.address);
 
             const [balance, mintAmount, trustRels, txnHistory] = await Promise.all([
-                loadedAvatar.getTotalBalance(),
-                loadedAvatar.getMintableAmount(),
-                loadedAvatar.getTrustRelations(),
-                loadedAvatar.getTransactionHistory(10)
+                loadedAvatar!.getTotalBalance(),
+                loadedAvatar!.getMintableAmount(),
+                loadedAvatar!.getTrustRelations(),
+                loadedAvatar!.getTransactionHistory(10)
             ]);
 
             totalBalance = balance;
@@ -56,9 +55,9 @@
             transactionHistory = txnHistory;
             avatar = loadedAvatar;
         } catch (e) {
-            error = e;
+            error = <any>e;
         }
-    }
+    });
 </script>
 
 {#if error}
@@ -67,12 +66,12 @@
     </p>
 {/if}
 {#if !avatar}
-    <button on:click={loadAvatar}>
-        Load avatar
-    </button>
+    <p>
+        Loading avatar ...
+    </p>
 {:else}
     <p>
-        Avatar {avatar.avatarInfo.avatar} is {avatar.avatarInfo.type}
+        Avatar {avatar.avatarInfo?.avatar} is {avatar.avatarInfo?.type}
     </p>
     <p>
         Circles balance: {totalBalance}
@@ -86,6 +85,6 @@
     </div>
     <div>
         Recent transactions:
-        <pre>{JSON.stringify(transactionHistory.currentPage.results, null, 2)}</pre>
+        <pre>{JSON.stringify(transactionHistory?.currentPage?.results, null, 2)}</pre>
     </div>
 {/if}

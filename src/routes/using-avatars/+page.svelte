@@ -1,9 +1,10 @@
+<!-- Svelte demo code for the "Using avatars" section of the Circles SDK documentation -->
 <script lang="ts">
-    import {Sdk, type ChainConfig, type SdkContractRunner, Avatar} from "@circles-sdk/sdk";
+    import {Sdk, type ChainConfig, type SdkContractRunner, type AvatarInterface} from "@circles-sdk/sdk";
     import {BrowserProvider} from "ethers";
     import {onMount} from "svelte";
 
-    let avatar: Avatar | undefined;
+    let avatar: AvatarInterface | undefined;
     let sdk: Sdk | undefined;
     let error: Error | undefined;
 
@@ -42,7 +43,7 @@
             // If you want to sign up an organization:
             // avatar = await sdk?.registerOrganization();
         } catch (e) {
-            error = e;
+            error = <any>e;
         }
     }
 
@@ -51,7 +52,7 @@
         try {
             avatar = await sdk?.getAvatar(sdk?.contractRunner.address);
         } catch (e) {
-            error = e;
+            error = <any>e;
         }
     }
 </script>
@@ -69,6 +70,6 @@
     </button>
 {:else}
     <p>
-        Avatar {avatar.avatarInfo.avatar} is {avatar.avatarInfo.type}
+        Avatar {avatar.avatarInfo?.avatar} is {avatar.avatarInfo?.type}
     </p>
 {/if}
