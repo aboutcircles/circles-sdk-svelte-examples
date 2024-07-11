@@ -28,7 +28,7 @@ The examples are bare bones, self-contained and are targeted to be run in a brow
 * Get some [xDAI](https://docs.gnosischain.com/about/tokens/xdai) (e.g. from a [faucet](https://docs.gnosischain.com/tools/Faucets)) and send it to your MetaMask account
 ### 2. Clone the repository
 ```bash
-git clone .. 
+git clone https://github.com/aboutcircles/circles-sdk-svelte-examples.git
 ```
 
 ### 3. Install dependencies
