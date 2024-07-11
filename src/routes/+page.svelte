@@ -1,10 +1,11 @@
 <script lang="ts">
-    import {Sdk, type ChainConfig, type SdkContractRunner} from "@circles-sdk/sdk";
+    import {Sdk, type ChainConfig, type SdkContractRunner, Avatar} from "@circles-sdk/sdk";
     import {BrowserProvider} from "ethers";
     import {onMount} from "svelte";
 
-    let avatarAddress = "0xb235B56b91eccb9DbdF811D7b5C45c363AcaE98D";
-    let avatarType = "";
+    let avatar: Avatar | undefined;
+    let sdk: Sdk | undefined;
+    let error: Error | undefined;
 
     const chainConfig: ChainConfig = {
         pathfinderUrl: 'https://pathfinder.aboutcircles.com',
@@ -12,7 +13,7 @@
         v1HubAddress: "0x29b9a7fbb8995b2423a71cc17cf9810798f6c543"
     };
 
-    async function getRunner() : Promise<SdkContractRunner> {
+    async function getRunner(): Promise<SdkContractRunner> {
         const w: any = window;
         const browserProvider = new BrowserProvider(w.ethereum);
         const signer = await browserProvider.getSigner();
@@ -30,12 +31,41 @@
     }
 
     onMount(async () => {
-        const sdk = await getSdk();
-        const avatar = await sdk.getAvatar(avatarAddress);
-
-        avatarType = avatar.avatarInfo?.type;
+        sdk = await getSdk();
     });
+
+    async function registerHuman() {
+        error = undefined;
+        try {
+            avatar = await sdk?.registerHuman();
+        } catch (e) {
+            error = e;
+        }
+    }
+
+    async function loadAvatar() {
+        error = undefined;
+        try {
+            avatar = await sdk?.getAvatar(sdk?.contractRunner.address);
+        } catch (e) {
+            error = e;
+        }
+    }
 </script>
-<p>
-    Avatar {avatarAddress} is {avatarType}
-</p>
+{#if error}
+    <p style="color: darkred">
+        Error: {error.message}
+    </p>
+{/if}
+{#if !avatar}
+    <button on:click={registerHuman}>
+        Register Human
+    </button>
+    <button on:click={loadAvatar}>
+        Load avatar
+    </button>
+{:else}
+    <p>
+        Avatar {avatar.avatarInfo.avatar} is {avatar.avatarInfo.type}
+    </p>
+{/if}
