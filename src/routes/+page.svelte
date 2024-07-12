@@ -33,11 +33,6 @@
             throw new Error('MetaMask is not installed.');
         }
 
-        const network = await provider.getNetwork();
-        if (network.chainId !== 100n && network.chainId !== 10200n) {
-            throw new Error('MetaMask is not connected to the required network. Please switch to Gnosis Chain (100) or Chiado (10200).');
-        }
-
         await w.ethereum.request({
             method: 'wallet_addEthereumChain',
             params: [networkData]
